@@ -80,8 +80,6 @@ void main(void)
             msb |= 1;
         }
 
-        printf("%3d %3d %hhu\n", x, y, msb);
-
         SPRITE0_X = (unsigned char)x;
         SPRITE0_Y = (unsigned char)y;
         SPRITE_XMSB = msb;

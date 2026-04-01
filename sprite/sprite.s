@@ -11,7 +11,6 @@
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
 	.forceimport	__STARTUP__
-	.import		_printf
 	.import		_kbhit
 	.export		_main
 
@@ -81,11 +80,6 @@ _sprite_data:
 	.byte	$00
 	.byte	$00
 	.byte	$00
-
-.segment	"RODATA"
-
-S0001:
-	.byte	$25,$33,$44,$20,$25,$33,$44,$20,$25,$48,$48,$55,$0D,$00
 
 ; ---------------------------------------------------------------
 ; void __near__ wait_vsync (void)
@@ -322,22 +316,7 @@ L001E:	asl     a
 	ora     #$01
 	ldy     #$00
 	sta     (c_sp),y
-L001D:	lda     #<(S0001)
-	ldx     #>(S0001)
-	jsr     pushax
-	ldy     #$08
-	jsr     ldaxysp
-	jsr     pushax
-	ldy     #$08
-	jsr     ldaxysp
-	jsr     pushax
-	ldy     #$06
-	ldx     #$00
-	lda     (c_sp),y
-	jsr     pushax
-	ldy     #$08
-	jsr     _printf
-	ldy     #$05
+L001D:	ldy     #$05
 	ldx     #$00
 	lda     (c_sp),y
 	sta     $D000
