@@ -182,119 +182,105 @@ L0003:	ldx     #$00
 	sta     $D015
 	jmp     L000A
 L0008:	jsr     _wait_vsync
-	ldy     #$02
-	ldx     #$00
-	lda     (c_sp),y
-	bpl     L000B
-	dex
-L000B:	ldy     #$05
-	jsr     addeqysp
-	ldy     #$01
-	ldx     #$00
-	lda     (c_sp),y
-	bpl     L000C
-	dex
-L000C:	ldy     #$03
-	jsr     addeqysp
 	ldy     #$06
 	jsr     ldaxysp
 	cmp     #$19
 	txa
 	sbc     #$00
-	bvc     L000E
+	bvc     L000C
 	eor     #$80
-L000E:	asl     a
+L000C:	asl     a
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jne     L000F
+	jne     L000D
 	ldy     #$06
 	jsr     ldaxysp
 	cmp     #$40
 	txa
 	sbc     #$01
-	bvs     L0010
+	bvs     L000E
 	eor     #$80
-L0010:	asl     a
+L000E:	asl     a
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jne     L000F
+	jne     L000D
 	ldx     #$00
 	lda     #$00
-	jeq     L0011
-L000F:	ldx     #$00
+	jeq     L000F
+L000D:	ldx     #$00
 	lda     #$01
-L0011:	jeq     L000D
+L000F:	jeq     L000B
 	ldy     #$02
 	ldx     #$00
 	lda     (c_sp),y
-	bpl     L0012
+	bpl     L0010
 	dex
-L0012:	jsr     negax
+L0010:	jsr     negax
 	ldx     #$00
 	cmp     #$80
-	bcc     L0013
+	bcc     L0011
 	dex
-L0013:	ldy     #$02
+L0011:	ldy     #$02
 	sta     (c_sp),y
-	ldy     #$02
-	ldx     #$00
-	lda     (c_sp),y
-	bpl     L0014
-	dex
-L0014:	ldy     #$05
-	jsr     addeqysp
-L000D:	ldy     #$04
+L000B:	ldy     #$04
 	jsr     ldaxysp
 	cmp     #$33
 	txa
 	sbc     #$00
-	bvc     L0016
+	bvc     L0013
 	eor     #$80
-L0016:	asl     a
+L0013:	asl     a
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jne     L0017
+	jne     L0014
 	ldy     #$04
 	jsr     ldaxysp
 	cmp     #$E6
 	txa
 	sbc     #$00
-	bvs     L0018
+	bvs     L0015
 	eor     #$80
-L0018:	asl     a
+L0015:	asl     a
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jne     L0017
+	jne     L0014
 	ldx     #$00
 	lda     #$00
-	jeq     L0019
-L0017:	ldx     #$00
+	jeq     L0016
+L0014:	ldx     #$00
 	lda     #$01
-L0019:	jeq     L0015
+L0016:	jeq     L0012
+	ldy     #$01
+	ldx     #$00
+	lda     (c_sp),y
+	bpl     L0017
+	dex
+L0017:	jsr     negax
+	ldx     #$00
+	cmp     #$80
+	bcc     L0018
+	dex
+L0018:	ldy     #$01
+	sta     (c_sp),y
+L0012:	ldy     #$02
+	ldx     #$00
+	lda     (c_sp),y
+	bpl     L0019
+	dex
+L0019:	ldy     #$05
+	jsr     addeqysp
 	ldy     #$01
 	ldx     #$00
 	lda     (c_sp),y
 	bpl     L001A
 	dex
-L001A:	jsr     negax
-	ldx     #$00
-	cmp     #$80
-	bcc     L001B
-	dex
-L001B:	ldy     #$01
-	sta     (c_sp),y
-	ldy     #$01
-	ldx     #$00
-	lda     (c_sp),y
-	bpl     L001C
-	dex
-L001C:	ldy     #$03
+L001A:	ldy     #$03
 	jsr     addeqysp
-L0015:	ldx     #$00
+	ldx     #$00
 	lda     #$00
 	ldy     #$00
 	sta     (c_sp),y
@@ -303,20 +289,20 @@ L0015:	ldx     #$00
 	cmp     #$00
 	txa
 	sbc     #$01
-	bvs     L001E
+	bvs     L001C
 	eor     #$80
-L001E:	asl     a
+L001C:	asl     a
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jeq     L001D
+	jeq     L001B
 	ldy     #$00
 	ldx     #$00
 	lda     (c_sp),y
 	ora     #$01
 	ldy     #$00
 	sta     (c_sp),y
-L001D:	ldy     #$05
+L001B:	ldy     #$05
 	ldx     #$00
 	lda     (c_sp),y
 	sta     $D000

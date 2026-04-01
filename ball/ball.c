@@ -62,18 +62,11 @@ void main(void)
     while (!kbhit()) {
         wait_vsync();
 
+		if (x <= 24 || x >= 320) dx = -dx;
+		if (y <= 50 || y >= 230) dy = -dy;
+
         x += dx;
         y += dy;
-
-        if (x <= 24 || x >= 320) {
-            dx = -dx;
-            x += dx;
-        }
-
-        if (y <= 50 || y >= 230) {
-            dy = -dy;
-            y += dy;
-        }
 
         msb = 0;
         if (x > 255) {
