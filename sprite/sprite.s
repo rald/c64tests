@@ -11,6 +11,8 @@
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
 	.forceimport	__STARTUP__
+	.import		_printf
+	.import		_kbhit
 	.export		_main
 
 .segment	"DATA"
@@ -80,6 +82,11 @@ _sprite_data:
 	.byte	$00
 	.byte	$00
 
+.segment	"RODATA"
+
+S0001:
+	.byte	$25,$33,$44,$20,$25,$33,$44,$20,$25,$48,$48,$55,$0D,$00
+
 ; ---------------------------------------------------------------
 ; void __near__ wait_vsync (void)
 ; ---------------------------------------------------------------
@@ -116,15 +123,15 @@ L0005:	ldx     #$00
 
 .segment	"CODE"
 
-	jsr     decsp6
+	jsr     decsp8
 	ldx     #$00
 	lda     #$28
-	ldy     #$04
-	sta     (c_sp),y
+	ldy     #$05
+	jsr     staxysp
 	ldx     #$00
 	lda     #$50
 	ldy     #$03
-	sta     (c_sp),y
+	jsr     staxysp
 	ldx     #$00
 	lda     #$01
 	ldy     #$02
@@ -135,13 +142,9 @@ L0005:	ldx     #$00
 	sta     (c_sp),y
 	ldx     #$00
 	lda     #$00
-	ldy     #$00
+	ldy     #$07
 	sta     (c_sp),y
-	ldx     #$00
-	lda     #$00
-	ldy     #$05
-	sta     (c_sp),y
-L0002:	ldy     #$05
+L0002:	ldy     #$07
 	ldx     #$00
 	lda     (c_sp),y
 	cmp     #$3F
@@ -150,7 +153,7 @@ L0002:	ldy     #$05
 	jmp     L0003
 L0005:	ldx     #$20
 	lda     #$00
-	ldy     #$05
+	ldy     #$07
 	clc
 	adc     (c_sp),y
 	bcc     L0006
@@ -158,7 +161,7 @@ L0005:	ldx     #$20
 L0006:	jsr     pushax
 	lda     #<(_sprite_data)
 	ldx     #>(_sprite_data)
-	ldy     #$07
+	ldy     #$09
 	clc
 	adc     (c_sp),y
 	bcc     L0007
@@ -167,7 +170,7 @@ L0007:	ldy     #$00
 	jsr     ldauidx
 	ldy     #$00
 	jsr     staspidx
-	ldy     #$05
+	ldy     #$07
 	ldx     #$00
 	clc
 	lda     #$01
@@ -184,33 +187,22 @@ L0003:	ldx     #$00
 	lda     #$01
 	sta     $D015
 	jmp     L000A
-L0008:	jsr     decsp4
-	jsr     _wait_vsync
-	ldy     #$08
-	ldx     #$00
-	lda     (c_sp),y
-	jsr     pushax
-	ldy     #$08
+L0008:	jsr     _wait_vsync
+	ldy     #$02
 	ldx     #$00
 	lda     (c_sp),y
 	bpl     L000B
 	dex
-L000B:	jsr     tosaddax
-	ldy     #$02
-	jsr     staxysp
-	ldy     #$07
-	ldx     #$00
-	lda     (c_sp),y
-	jsr     pushax
-	ldy     #$07
+L000B:	ldy     #$05
+	jsr     addeqysp
+	ldy     #$01
 	ldx     #$00
 	lda     (c_sp),y
 	bpl     L000C
 	dex
-L000C:	jsr     tosaddax
-	ldy     #$00
-	jsr     staxysp
-	ldy     #$03
+L000C:	ldy     #$03
+	jsr     addeqysp
+	ldy     #$06
 	jsr     ldaxysp
 	cmp     #$19
 	txa
@@ -222,11 +214,11 @@ L000E:	asl     a
 	ldx     #$00
 	rol     a
 	jne     L000F
-	ldy     #$03
+	ldy     #$06
 	jsr     ldaxysp
-	cmp     #$EE
+	cmp     #$40
 	txa
-	sbc     #$00
+	sbc     #$01
 	bvs     L0010
 	eor     #$80
 L0010:	asl     a
@@ -240,7 +232,7 @@ L0010:	asl     a
 L000F:	ldx     #$00
 	lda     #$01
 L0011:	jeq     L000D
-	ldy     #$06
+	ldy     #$02
 	ldx     #$00
 	lda     (c_sp),y
 	bpl     L0012
@@ -250,21 +242,16 @@ L0012:	jsr     negax
 	cmp     #$80
 	bcc     L0013
 	dex
-L0013:	ldy     #$06
+L0013:	ldy     #$02
 	sta     (c_sp),y
-	ldy     #$08
-	ldx     #$00
-	lda     (c_sp),y
-	jsr     pushax
-	ldy     #$08
+	ldy     #$02
 	ldx     #$00
 	lda     (c_sp),y
 	bpl     L0014
 	dex
-L0014:	jsr     tosaddax
-	ldy     #$02
-	jsr     staxysp
-L000D:	ldy     #$01
+L0014:	ldy     #$05
+	jsr     addeqysp
+L000D:	ldy     #$04
 	jsr     ldaxysp
 	cmp     #$33
 	txa
@@ -276,7 +263,7 @@ L0016:	asl     a
 	ldx     #$00
 	rol     a
 	jne     L0017
-	ldy     #$01
+	ldy     #$04
 	jsr     ldaxysp
 	cmp     #$E6
 	txa
@@ -294,7 +281,7 @@ L0018:	asl     a
 L0017:	ldx     #$00
 	lda     #$01
 L0019:	jeq     L0015
-	ldy     #$05
+	ldy     #$01
 	ldx     #$00
 	lda     (c_sp),y
 	bpl     L001A
@@ -304,31 +291,20 @@ L001A:	jsr     negax
 	cmp     #$80
 	bcc     L001B
 	dex
-L001B:	ldy     #$05
+L001B:	ldy     #$01
 	sta     (c_sp),y
-	ldy     #$07
-	ldx     #$00
-	lda     (c_sp),y
-	jsr     pushax
-	ldy     #$07
+	ldy     #$01
 	ldx     #$00
 	lda     (c_sp),y
 	bpl     L001C
 	dex
-L001C:	jsr     tosaddax
+L001C:	ldy     #$03
+	jsr     addeqysp
+L0015:	ldx     #$00
+	lda     #$00
 	ldy     #$00
-	jsr     staxysp
-L0015:	ldy     #$02
-	ldx     #$00
-	lda     (c_sp),y
-	ldy     #$08
 	sta     (c_sp),y
-	ldy     #$00
-	ldx     #$00
-	lda     (c_sp),y
-	ldy     #$07
-	sta     (c_sp),y
-	ldy     #$03
+	ldy     #$06
 	jsr     ldaxysp
 	cmp     #$00
 	txa
@@ -340,33 +316,45 @@ L001E:	asl     a
 	ldx     #$00
 	rol     a
 	jeq     L001D
-	ldy     #$04
+	ldy     #$00
 	ldx     #$00
 	lda     (c_sp),y
 	ora     #$01
-	ldy     #$04
+	ldy     #$00
 	sta     (c_sp),y
-	jmp     L001F
-L001D:	ldy     #$04
+L001D:	lda     #<(S0001)
+	ldx     #>(S0001)
+	jsr     pushax
+	ldy     #$08
+	jsr     ldaxysp
+	jsr     pushax
+	ldy     #$08
+	jsr     ldaxysp
+	jsr     pushax
+	ldy     #$06
 	ldx     #$00
 	lda     (c_sp),y
-	and     #$FE
-	ldy     #$04
-	sta     (c_sp),y
-L001F:	ldy     #$08
+	jsr     pushax
+	ldy     #$08
+	jsr     _printf
+	ldy     #$05
 	ldx     #$00
 	lda     (c_sp),y
 	sta     $D000
-	ldy     #$07
+	ldy     #$03
 	ldx     #$00
 	lda     (c_sp),y
 	sta     $D001
-	ldy     #$04
+	ldy     #$00
 	ldx     #$00
 	lda     (c_sp),y
 	sta     $D010
-	jsr     incsp4
-L000A:	jmp     L0008
+L000A:	jsr     _kbhit
+	jsr     bnega
+	jne     L0008
+	ldx     #$00
+	lda     #$00
+	sta     $D015
 	rts
 
 .endproc

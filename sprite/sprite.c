@@ -1,11 +1,14 @@
 #include <c64.h>
+#include <stdio.h>
+#include <conio.h>
 
-#define SPRITE0_X   (*(unsigned char*)0xD000)
-#define SPRITE0_Y   (*(unsigned char*)0xD001)
-#define SPRITE_EN   (*(unsigned char*)0xD015)
-#define SPRITE_PTR0 (*(unsigned char*)0x07F8)
-#define SPRITE_COL0 (*(unsigned char*)0xD027)
-#define SPRITE_XMSB (*(unsigned char*)0xD010)
+#define SPRITE0_DATA ((unsigned char*)0x2000)
+#define SPRITE0_X    (*(unsigned char*)0xD000)
+#define SPRITE0_Y    (*(unsigned char*)0xD001)
+#define SPRITE_EN    (*(unsigned char*)0xD015)
+#define SPRITE_PTR0  (*(unsigned char*)0x07F8)
+#define SPRITE_COL0  (*(unsigned char*)0xD027)
+#define SPRITE_XMSB  (*(unsigned char*)0xD010)
 
 static unsigned char sprite_data[63] = {
     0x00,0x00,0x00,
@@ -39,53 +42,50 @@ static void wait_vsync(void) {
 void main(void)
 {
     unsigned char i;
-    unsigned char x;
-    unsigned char y;
-    signed char dx;
-    signed char dy;
+    int x, y;
+    signed char dx, dy;
     unsigned char msb;
 
     x = 40;
     y = 80;
     dx = 1;
     dy = 1;
-    msb = 0;
 
     for (i = 0; i < 63; ++i) {
-        ((unsigned char*)0x2000)[i] = sprite_data[i];
+        SPRITE0_DATA[i] = sprite_data[i];
     }
 
     SPRITE_PTR0 = 0x80;
     SPRITE_COL0 = 1;
     SPRITE_EN = 1;
 
-    while (1) {
-        int nx;
-        int ny;
+    while (!kbhit()) {
+        wait_vsync();
 
-		wait_vsync();
+        x += dx;
+        y += dy;
 
-        nx = (int)x + dx;
-        ny = (int)y + dy;
-
-        if (nx <= 24 || nx >= 238) {
+        if (x <= 24 || x >= 320) {
             dx = -dx;
-            nx = (int)x + dx;
+            x += dx;
         }
 
-        if (ny <= 50 || ny >= 230) {
+        if (y <= 50 || y >= 230) {
             dy = -dy;
-            ny = (int)y + dy;
+            y += dy;
         }
 
-        x = (unsigned char)nx;
-        y = (unsigned char)ny;
+        msb = 0;
+        if (x > 255) {
+            msb |= 1;
+        }
 
-        if (nx > 255) msb |= 1;
-        else msb &= (unsigned char)~1;
+        printf("%3d %3d %hhu\n", x, y, msb);
 
-        SPRITE0_X = x;
-        SPRITE0_Y = y;
+        SPRITE0_X = (unsigned char)x;
+        SPRITE0_Y = (unsigned char)y;
         SPRITE_XMSB = msb;
     }
+
+    SPRITE_EN = 0;
 }
